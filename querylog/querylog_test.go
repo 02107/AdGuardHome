@@ -14,7 +14,7 @@ func TestQueryLog(t *testing.T) {
 	conf := Config{
 		Interval: 1,
 	}
-	l := New(conf)
+	l := newQueryLog(conf)
 
 	q := dns.Msg{}
 	q.Question = append(q.Question, dns.Question{
@@ -37,10 +37,10 @@ func TestQueryLog(t *testing.T) {
 	res := dnsfilter.Result{}
 	l.Add(&q, &a, &res, 0, nil, "upstream")
 
-	params := GetDataParams{
+	params := getDataParams{
 		OlderThan: time.Now(),
 	}
-	d := l.GetData(params)
+	d := l.getData(params)
 	m := d[0]
 	mq := m["question"].(map[string]interface{})
 	assert.True(t, mq["host"].(string) == "example.org")

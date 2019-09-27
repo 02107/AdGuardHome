@@ -273,10 +273,6 @@ func parseConfig() error {
 		config.DNS.FiltersUpdateIntervalHours = 24
 	}
 
-	if !checkQueryLogInterval(config.DNS.QueryLogInterval) {
-		config.DNS.QueryLogInterval = 1
-	}
-
 	for _, cy := range config.Clients {
 		cli := Client{
 			Name:                cy.Name,
@@ -357,6 +353,13 @@ func (c *configuration) write() error {
 		sdc := stats.DiskConfig{}
 		config.stats.WriteDiskConfig(&sdc)
 		config.DNS.StatsInterval = sdc.Interval
+	}
+
+	if config.queryLog != nil {
+		dc := querylog.DiskConfig{}
+		config.queryLog.WriteDiskConfig(&dc)
+		config.DNS.QueryLogEnabled = !dc.Disabled
+		config.DNS.QueryLogInterval = dc.Interval
 	}
 
 	configFile := config.getConfigFilename()
